@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/6vm6uphq73eb6s65?svg=true)](https://ci.appveyor.com/project/anisimovsergey/go-gems)
+[![Build status](https://travis-ci.org/anisimovsergey/go-gems.svg?branch=master)](https://travis-ci.org/anisimovsergey/go-gems)
 
 # go-gems
 Different interesting things implemented in Golang
