@@ -8,9 +8,6 @@ import (
 // Request is a generic request
 type Request interface{}
 
-// Response is a response to a request
-type Response interface{}
-
 // Event is a generic event
 type Event interface{}
 
@@ -19,7 +16,7 @@ type HandlerFunc interface{}
 
 // Bus defines an interface for a bus
 type Bus interface {
-	SendRequest(r Request) (Response, error)
+	SendRequest(q Request) error
 	BroadcastEvent(e Event) error
 
 	AddRequestHandler(handler HandlerFunc)
@@ -39,25 +36,24 @@ func NewBus() Bus {
 	}
 }
 
-func (b *busImpl) SendRequest(r Request) (Response, error) {
-	var rType = reflect.TypeOf(r).Elem().Name()
+func (b *busImpl) SendRequest(q Request) error {
+	var rType = reflect.TypeOf(q).Elem().Name()
 
 	var handler = b.handlers[rType]
 	if handler == nil {
-		return nil, fmt.Errorf("handler not found for %s", rType)
+		return fmt.Errorf("handler not found for %s", rType)
 	}
 
 	var params = make([]reflect.Value, 1)
-	params[0] = reflect.ValueOf(r)
+	params[0] = reflect.ValueOf(q)
 
 	ret := reflect.ValueOf(handler).Call(params)
-	rsp := ret[0].Interface()
-	err := ret[1].Interface()
-	if err != nil {
-		return nil, err.(error)
+	err := ret[0].Interface()
+	if err == nil {
+		return nil
+	} else {
+		return err.(error)
 	}
-
-	return rsp.(Response), nil
 }
 
 func (b *busImpl) BroadcastEvent(e Event) error {

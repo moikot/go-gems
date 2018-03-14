@@ -7,17 +7,18 @@ import (
 )
 
 type TestQuery struct {
-	ID int64
+	ID       int64
+	Response string
 }
 
 func TestQueryHandlerReturnsError(t *testing.T) {
 	bus := NewBus()
 
-	bus.AddRequestHandler(func(query *TestQuery) (Response, error) {
-		return nil, errors.New("handler error")
+	bus.AddRequestHandler(func(q *TestQuery) error {
+		return errors.New("handler error")
 	})
 
-	_, err := bus.SendRequest(&TestQuery{})
+	err := bus.SendRequest(&TestQuery{})
 
 	if err == nil {
 		t.Fatal("Send query failed " + err.Error())
@@ -29,16 +30,17 @@ func TestQueryHandlerReturnsError(t *testing.T) {
 func TestQueryHandlerReturn(t *testing.T) {
 	bus := NewBus()
 
-	bus.AddRequestHandler(func(q *TestQuery) (Response, error) {
-		return "hello from handler", nil
+	bus.AddRequestHandler(func(q *TestQuery) error {
+		q.Response = "hello from handler"
+		return nil
 	})
 
-	query := &TestQuery{}
-	resp, err := bus.SendRequest(query)
+	q := &TestQuery{}
+	err := bus.SendRequest(q)
 
 	if err != nil {
 		t.Fatal("Send query failed " + err.Error())
-	} else if resp != "hello from handler" {
+	} else if q.Response != "hello from handler" {
 		t.Fatal("Failed to get response from handler")
 	}
 }
