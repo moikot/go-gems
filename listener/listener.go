@@ -46,7 +46,7 @@ func (b *listener) Handle(messageType string, data []byte) error {
 	elem := handlerType.In(0).Elem()
 	v := reflect.New(elem)
 
-	if err := json.Unmarshal(data, &v); err != nil {
+	if err := json.Unmarshal(data, v.Interface()); err != nil {
 		return fmt.Errorf("unable to marshal %s, %v", elem.Name(), err)
 	}
 

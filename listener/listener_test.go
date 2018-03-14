@@ -6,8 +6,8 @@ import (
 )
 
 type TestMessage struct {
-	s string
-	i int
+	S string `json:"s"`
+	I int    `json:"i"`
 }
 
 func TestQueryHandlerReturn(t *testing.T) {
@@ -16,19 +16,18 @@ func TestQueryHandlerReturn(t *testing.T) {
 	var i int
 
 	bus.AddHandler(func(q *TestMessage) error {
-		s = q.s
-		i = q.i
+		s = q.S
+		i = q.I
 		return nil
 	})
 
-	q := &TestMessage{s: "test", i: 1}
+	q := &TestMessage{S: "test", I: 1}
 	b, _ := json.Marshal(q)
-
 	err := bus.Handle("TestMessage", b)
 
 	if err != nil {
 		t.Fatal("Handle failed " + err.Error())
 	} else if s != "test" || i != 1 {
-		t.Fatal("Failed to get response from handler")
+		t.Fatalf("Failed to get response from handler %v, %v", s, i)
 	}
 }
